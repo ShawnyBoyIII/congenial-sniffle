@@ -11,7 +11,7 @@ from bootable import create_bootable_usb
 class AppGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Data Extraction Tool (Broken Media)")
+        self.root.title("ResQCard - Data Extraction Tool")
         self.root.geometry("600x500")
 
         self.cancel_event = threading.Event()

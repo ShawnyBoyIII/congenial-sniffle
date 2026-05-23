@@ -1,2 +1,1 @@
-# Dependencies will go here, currently standard library is mostly used except perhaps requests for downloading the ISO.
-requests
+# No external dependencies required. This application relies purely on the standard Python 3 library (e.g. tkinter, urllib).

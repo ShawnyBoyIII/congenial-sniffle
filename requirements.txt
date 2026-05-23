@@ -1,1 +1,3 @@
-# No external dependencies required. This application relies purely on the standard Python 3 library (e.g. tkinter, urllib).
+# No external dependencies required for running the core application.
+# PyInstaller is required for building standalone executables.
+pyinstaller

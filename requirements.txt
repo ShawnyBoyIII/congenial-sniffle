@@ -1,0 +1,2 @@
+# Dependencies will go here, currently standard library is mostly used except perhaps requests for downloading the ISO.
+requests

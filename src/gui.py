@@ -7,6 +7,7 @@ import os
 from imager import create_image
 from carver import carve_files
 from bootable import create_bootable_usb
+from discovery import get_drive_descriptions, get_device_path
 
 class AppGUI:
     def __init__(self, root):
@@ -18,6 +19,21 @@ class AppGUI:
         self.worker_thread = None
 
         self.create_widgets()
+        self.refresh_drives()
+
+    def refresh_drives(self):
+        """Populate the dropdowns with available drives."""
+        self.status_var.set("Scanning for drives...")
+        self.root.update_idletasks()
+
+        try:
+            drives = get_drive_descriptions()
+            self.imager_src_combo['values'] = drives
+            self.boot_dst_combo['values'] = drives
+            self.status_var.set("Ready.")
+        except Exception as e:
+            self.status_var.set("Failed to refresh drives.")
+            messagebox.showwarning("Warning", f"Could not refresh drives: {e}")
 
     def create_widgets(self):
         # Notebook for tabs
@@ -52,21 +68,26 @@ class AppGUI:
     def setup_imager_tab(self):
         frame = self.tab_imager
 
-        ttk.Label(frame, text="Source Device / File (e.g. /dev/sdb):").grid(row=0, column=0, sticky='w', pady=5)
+        ttk.Label(frame, text="Source Device:").grid(row=0, column=0, sticky='w', pady=5)
         self.imager_src = tk.StringVar()
-        ttk.Entry(frame, textvariable=self.imager_src, width=40).grid(row=0, column=1, padx=5)
-        ttk.Button(frame, text="Browse", command=lambda: self.browse_file(self.imager_src)).grid(row=0, column=2)
+        self.imager_src_combo = ttk.Combobox(frame, textvariable=self.imager_src, width=38)
+        self.imager_src_combo.grid(row=0, column=1, padx=5)
+
+        btn_frame = ttk.Frame(frame)
+        btn_frame.grid(row=0, column=2)
+        ttk.Button(btn_frame, text="Refresh", command=self.refresh_drives).pack(side='left', padx=2)
+        ttk.Button(btn_frame, text="File...", command=lambda: self.browse_file(self.imager_src)).pack(side='left', padx=2)
 
         ttk.Label(frame, text="Destination Image (.img):").grid(row=1, column=0, sticky='w', pady=5)
         self.imager_dst = tk.StringVar()
         ttk.Entry(frame, textvariable=self.imager_dst, width=40).grid(row=1, column=1, padx=5)
-        ttk.Button(frame, text="Browse", command=lambda: self.browse_save_file(self.imager_dst, [("Image Files", "*.img")])).grid(row=1, column=2)
+        ttk.Button(frame, text="Browse", command=lambda: self.browse_save_file(self.imager_dst, [("Image Files", "*.img")])).grid(row=1, column=2, padx=2, sticky='w')
 
         ttk.Button(frame, text="Start Imaging", command=self.start_imaging).grid(row=2, column=0, columnspan=3, pady=20)
         ttk.Button(frame, text="Cancel", command=self.cancel_task).grid(row=3, column=0, columnspan=3)
 
     def start_imaging(self):
-        src = self.imager_src.get()
+        src = get_device_path(self.imager_src.get())
         dst = self.imager_dst.get()
         if not src or not dst:
             messagebox.showerror("Error", "Please specify source and destination.")
@@ -121,15 +142,18 @@ class AppGUI:
     def setup_bootable_tab(self):
         frame = self.tab_bootable
 
-        ttk.Label(frame, text="Target USB Device (e.g. /dev/sdc):\\nWARNING: THIS WILL WIPE THE DRIVE").grid(row=0, column=0, sticky='w', pady=5)
+        ttk.Label(frame, text="Target USB Device:\\nWARNING: THIS WILL WIPE THE DRIVE").grid(row=0, column=0, sticky='w', pady=5)
         self.boot_dst = tk.StringVar()
-        ttk.Entry(frame, textvariable=self.boot_dst, width=40).grid(row=0, column=1, padx=5)
+        self.boot_dst_combo = ttk.Combobox(frame, textvariable=self.boot_dst, width=38)
+        self.boot_dst_combo.grid(row=0, column=1, padx=5)
 
-        ttk.Button(frame, text="Create Bootable USB", command=self.start_bootable).grid(row=1, column=0, columnspan=2, pady=20)
-        ttk.Button(frame, text="Cancel", command=self.cancel_task).grid(row=2, column=0, columnspan=2)
+        ttk.Button(frame, text="Refresh", command=self.refresh_drives).grid(row=0, column=2, padx=2, sticky='w')
+
+        ttk.Button(frame, text="Create Bootable USB", command=self.start_bootable).grid(row=1, column=0, columnspan=3, pady=20)
+        ttk.Button(frame, text="Cancel", command=self.cancel_task).grid(row=2, column=0, columnspan=3)
 
     def start_bootable(self):
-        dst = self.boot_dst.get()
+        dst = get_device_path(self.boot_dst.get())
         if not dst:
             messagebox.showerror("Error", "Please specify target USB device.")
             return

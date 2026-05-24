@@ -1,3 +1,5 @@
-# No external dependencies required for running the core application.
+# Core Application Dependencies
+psutil
+
 # PyInstaller is required for building standalone executables.
 pyinstaller

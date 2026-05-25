@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import threading
-import sys
-import os
 
 from imager import create_image
 from carver import carve_files

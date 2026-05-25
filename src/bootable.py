@@ -1,7 +1,6 @@
 import os
 import urllib.request
 import tempfile
-import tarfile
 import shutil
 
 # For this example, we would normally download a real ISO like Alpine Linux or TinyCore

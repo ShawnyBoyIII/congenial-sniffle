@@ -1,5 +1,4 @@
 import os
-import time
 
 def create_image(source_path, dest_path, block_size=4096, progress_callback=None, cancel_event=None):
     """

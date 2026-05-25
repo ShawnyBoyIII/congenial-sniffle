@@ -91,8 +91,6 @@ def get_drives():
     elif sys_plat == "Darwin": # macOS
         try:
             # diskutil list -plist could be parsed, or simple awk
-            cmd = ['diskutil', 'list']
-            output = subprocess.check_output(cmd).decode('utf-8', errors='ignore')
             # Fallback simple parsing for macOS can be complex, adding basic placeholder
             pass
         except Exception:
